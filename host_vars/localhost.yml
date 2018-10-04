@@ -1,1 +1,5 @@
 ansible_python_interpreter: /home/ubuntu/venv/bin/python2.7
+keypair: ansible-demo
+instance_type: t2.micro
+image: ami-0552e3455b9bc8d50
+region: us-east-2

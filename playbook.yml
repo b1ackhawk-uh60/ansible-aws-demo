@@ -4,10 +4,10 @@
   roles:
     - role: ec2_base
       vars:
-        keypair: ansible-demo
-        instance_type: t2.micro
-        image: ami-0552e3455b9bc8d50
-        region: us-east-2
+        #keypair: ansible-demo
+        #instance_type: t2.micro
+        #image: ami-0552e3455b9bc8d50
+        #region: us-east-2
         ec2_total_count: 1
         i_tags:
           Type: Ansible_Deployed
@@ -29,10 +29,10 @@
   roles:
     - role: ec2_base
       vars:
-        keypair: ansible-demo
-        instance_type: t2.micro
-        image: ami-0552e3455b9bc8d50
-        region: us-east-2
+        #keypair: ansible-demo
+        #instance_type: t2.micro
+        #image: ami-0552e3455b9bc8d50
+        #region: us-east-2
         ec2_total_count: "{{ ec2tc }}"
         i_tags:
           Type: Ansible_Deployed
@@ -123,10 +123,9 @@
           "tag:Class": "Flask"
           instance-state-name: running
         #aws_access_key:
-        #aws_secret_key: 
+        #aws_secret_key:
       register: ec2targets
-    -
-      debug:
+    - debug:
         var: item['instance_id']
       #register: with_output
       #debug: var=with_output
