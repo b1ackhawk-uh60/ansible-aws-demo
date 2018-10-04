@@ -1,0 +1,183 @@
+- name: Create db instance
+  hosts: localhost
+  gather_facts: False
+  roles:
+    - role: ec2_base
+      vars:
+        keypair: ansible-demo
+        instance_type: t2.micro
+        image: ami-0552e3455b9bc8d50
+        region: us-east-2
+        ec2_total_count: 1
+        i_tags:
+          Type: Ansible_Deployed
+          Class: MySQL
+        c_tag:
+          Class: MySQL
+        ec2_groups:
+          - ssh-only
+          - mysql all
+
+- name: Create web instances
+  hosts: localhost
+  gather_facts: False
+
+  vars_prompt:
+    - name: "ec2tc"
+      prompt: "How many ec2 web instances in total?"
+      private: no
+  roles:
+    - role: ec2_base
+      vars:
+        keypair: ansible-demo
+        instance_type: t2.micro
+        image: ami-0552e3455b9bc8d50
+        region: us-east-2
+        ec2_total_count: "{{ ec2tc }}"
+        i_tags:
+          Type: Ansible_Deployed
+          Class: Flask
+        c_tag:
+          Class: Flask
+        ec2_groups:
+          - ssh-only
+          - flask all
+
+
+- name: Install Ansible required Python
+  hosts: tag_Type_Ansible_Deployed
+  gather_facts: False
+  pre_tasks:
+  - pause:
+      seconds: 30
+  - name: Ansible required Python
+    raw: bash -c "test -e /usr/bin/python || (apt -qqy update && apt install -qqy python python-pip python3 python3-pip)"
+    become: true
+    register: output
+    changed_when: output.stdout != ""
+  tasks:
+
+- name: test ping
+  hosts: tag_Type_Ansible_Deployed
+  tasks:
+    #- name:
+    #- set_fact: ansible_ssh_private_key_file=/home/ubuntu/.ssh/ansible-demo.pem
+    #- set_fact: ansible_ssh_user=ubuntu
+    - ping:
+
+- name: Provision MySQL
+  hosts: tag_Class_MySQL
+  roles:
+    - python
+    - mysql
+
+- name: Get IP of MySQL
+  hosts: localhost
+  pre_tasks:
+    - name: Get IP of MySQL
+      #delegate_to: localhost
+      ec2_instance_facts:
+        region: us-east-2
+        filters:
+          "tag:Class": "MySQL"
+          instance-state-name: running
+        #aws_access_key: AKIAI5YHZTJ22BY3QABQ
+        #aws_secret_key: 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
+      register: ec2
+    - debug: var=ec2
+    #- shell: echo $PATH
+    #  register: something
+    #- debug: msg="{{ ec2.results['instances'][0]['public_ip_address' ]}}"
+
+- name: Deploy Web
+  hosts: tag_Class_Flask
+  pre_tasks:
+    - name: Get IP of MySQL
+      delegate_to: localhost
+      ec2_instance_facts:
+        region: us-east-2
+        filters:
+          "tag:Class": "MySQL"
+          instance-state-name: running
+        #aws_access_key: AKIAI5YHZTJ22BY3QABQ
+        #aws_secret_key: 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
+      register: ec2
+    - debug: var=ec2['instances'][0]['public_ip_address']
+
+  environment:
+    MYSQL_DATABASE_HOST: "{{ ec2['instances'][0]['public_ip_address'] }}"
+    #MYSQL_DATABASE_HOST: 18.188.113.57
+    #shell: "echo $MYSQL_DATABASE_HOST"
+
+  roles:
+    - python
+    - flask
+
+- name: add target group for alb
+  hosts: localhost
+  pre_tasks:
+    - name: Get web instance id's
+      ec2_instance_facts:
+        region: us-east-2
+        filters:
+          "tag:Class": "Flask"
+          instance-state-name: running
+        #aws_access_key: AKIAI5YHZTJ22BY3QABQ
+        #aws_secret_key: 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
+      register: ec2targets
+    -
+      debug:
+        var: item['instance_id']
+      #register: with_output
+      #debug: var=with_output
+      with_items: "{{ ec2targets['instances'] }}"
+
+
+    - name: create target group
+      elb_target_group:
+        name: ansible-app
+        region: us-east-2
+        protocol: http
+        port: 5000
+        vpc_id: vpc-5a406b32
+        health_check_path: /
+        #targets: "{{ tids }}"
+        #targets:
+        state: present
+        #wait_timeout: 200
+        #wait: True
+      #with_items: "{{ ec2targets['instances'] }}"
+    - name: register targets
+      elb_target:
+        target_group_name: ansible-app
+        region: us-east-2
+        target_id: "{{item['instance_id']}}"
+        #target_status: healthy
+        state: present
+      with_items:
+        - "{{ ec2targets['instances'] }}"
+
+
+
+
+- name: add alb
+  hosts: localhost
+  tasks:
+    - elb_application_lb:
+        name: ansible-alb
+        region: us-east-2
+        subnets:
+          - subnet-db1b46b3
+          - subnet-db8902a1
+          - subnet-0a6d9e46
+        security_groups:
+          - http only
+        scheme: internet-facing
+        listeners:
+          - Protocol: HTTP
+            Port: 80
+            DefaultActions:
+              - Type: forward
+                TargetGroupName: ansible-app
+            #SslPolicy: ELBSecurityPolicy-2015-05
+        state: present

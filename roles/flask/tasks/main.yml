@@ -1,0 +1,27 @@
+    - name: Install Python Flask dependency
+      pip:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - flask
+        - flask-mysql
+
+    - name: clone repo
+      git: >
+        repo=https://github.com/b1ackhawk-uh60/simple-webapp.git
+        dest=~/app
+
+    - name: echo env variable
+      shell: echo $MYSQL_DATABASE_HOST
+      register: dbhost
+    - debug: msg="dbhost is {{ dbhost.stdout }}"
+
+    - name: Start Web Server
+      #shell: python -m flask --version
+      shell: FLASK_APP=/home/ubuntu/app/app.py nohup python -m flask run --host=0.0.0.0 &
+      #shell: nohup python /home/ubuntu/app/app.py 2>&1 >/dev/null &
+      register: shell_output
+
+    - name: view output
+      debug:
+        var: shell_output

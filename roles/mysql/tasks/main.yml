@@ -1,0 +1,48 @@
+    - name: Install MySQL database
+      become: yes
+      apt:
+        name: "{{ item }}"
+        state:  installed
+      with_items:
+       - mysql-server
+       - mysql-client
+      register: shell_output
+    - debug:
+        var: shell_output
+
+    - name: Modify DB bind-address
+      become: yes
+      lineinfile:
+        path: /etc/mysql/mysql.conf.d/mysqld.cnf
+        state: present
+        regexp: '^bind-address'
+        line: '#bind-address           = 127.0.0.1'
+      register: shell_output
+    - debug:
+        var: shell_output
+
+    - name: Start Mysql Service
+      become: yes
+      service:
+        name: mysql
+        state: restarted
+        enabled: yes
+      register: shell_output
+    - debug:
+        var: shell_output
+
+    - name: Create Application Database
+      become: yes
+      become_user: root
+      mysql_db: name={{ db_name }} state=present login_unix_socket=/var/run/mysqld/mysqld.sock
+      register: shell_output
+    - debug:
+        var: shell_output
+
+    - name: Create Application DB User
+      become: yes
+      become_user: root
+      mysql_user: name={{ db_user }} password={{ db_password }} priv='*.*:ALL' host='%' state='present'
+      register: shell_output
+    - debug:
+        var: shell_output

@@ -1,0 +1,26 @@
+- name: Launch instance
+  ec2:
+    key_name: "{{ keypair }}"
+    group:
+      "{{ ec2_groups }}"
+    instance_type: "{{ instance_type }}"
+    image: "{{ image }}"
+    wait: true
+    region: "{{ region }}"
+    #aws_access_key:
+    #aws_secret_key:
+    instance_tags:
+      "{{ i_tags }}"
+    #count: 1
+    exact_count: "{{ ec2_total_count }}"
+    count_tag:
+      "{{ c_tag }}"
+
+  register: ec2
+- name: Print all ec2 variables
+  debug: var=ec2
+
+- name: Refresh EC2 cache
+  command: /etc/ansible/ec2.py --refresh-cache
+- name: Refresh in-memory EC2 cache
+  meta: refresh_inventory

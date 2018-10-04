@@ -1,0 +1,59 @@
+- name: Create an instance
+  hosts: localhost
+  gather_facts: False
+  vars:
+    keypair: ansible-demo
+    instance_type: t2.micro
+    image: ami-0552e3455b9bc8d50
+    region: us-east-2
+  vars_prompt:
+    - name: "ec2_total_count"
+      prompt: "How many ec2 instances in total?"
+      private: no
+  tasks:
+    - name: Launch instance
+      ec2:
+        key_name: "{{ keypair }}"
+        group: ssh-only
+        instance_type: "{{ instance_type }}"
+        image: "{{ image }}"
+        wait: true
+        region: "{{ region }}"
+        #aws_access_key:
+        #aws_secret_key: 
+        instance_tags:
+          Type: Ansible_Deployed
+        #count: 1
+        exact_count: "{{ ec2_total_count }}"
+        count_tag:
+          Type: Ansible_Deployed
+
+      register: ec2
+    - name: Print all ec2 variables
+      debug: var=ec2
+
+    - name: Refresh EC2 cache
+      command: /etc/ansible/ec2.py --refresh-cache
+    - name: Refresh in-memory EC2 cache
+      meta: refresh_inventory
+
+
+
+- name: Install python
+  hosts: tag_Type_Ansible_Deployed
+  gather_facts: False
+  pre_tasks:
+  - name: install python
+    raw: bash -c "test -e /usr/bin/python || (apt -qqy update && apt install -qqy python python-pip python3 python3-pip)"
+    become: true
+    register: output
+    changed_when: output.stdout != ""
+  tasks:
+
+- name: test ping
+  hosts: tag_Type_Ansible_Deployed
+  tasks:
+    #- name:
+    #- set_fact: ansible_ssh_private_key_file=/home/ubuntu/.ssh/ansible-demo.pem
+    #- set_fact: ansible_ssh_user=ubuntu
+    - ping:
