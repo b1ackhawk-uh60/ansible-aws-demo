@@ -81,8 +81,8 @@
         filters:
           "tag:Class": "MySQL"
           instance-state-name: running
-        #aws_access_key: AKIAI5YHZTJ22BY3QABQ
-        #aws_secret_key: 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
+        #aws_access_key:
+        #aws_secret_key:
       register: ec2
     - debug: var=ec2
     #- shell: echo $PATH
@@ -99,8 +99,8 @@
         filters:
           "tag:Class": "MySQL"
           instance-state-name: running
-        #aws_access_key: AKIAI5YHZTJ22BY3QABQ
-        #aws_secret_key: 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
+        #aws_access_key:
+        #aws_secret_key:
       register: ec2
     - debug: var=ec2['instances'][0]['public_ip_address']
 
@@ -122,8 +122,8 @@
         filters:
           "tag:Class": "Flask"
           instance-state-name: running
-        #aws_access_key: AKIAI5YHZTJ22BY3QABQ
-        #aws_secret_key: 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
+        #aws_access_key:
+        #aws_secret_key: 
       register: ec2targets
     -
       debug:
