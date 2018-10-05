@@ -1,3 +1,5 @@
 # ignore any pem files
 *.pem
 
+#ignore atom remote sync file
+.remote-sync.json
