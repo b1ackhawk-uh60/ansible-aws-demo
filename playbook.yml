@@ -42,7 +42,6 @@
           - ssh-only
           - flask all
 
-
 - name: Install Ansible required Python
   hosts: tag_Type_Ansible_Deployed
   gather_facts: False
@@ -69,12 +68,8 @@
         #aws_secret_key:
       register: ec2
     - debug: var=ec2['instances'][0]['public_ip_address']
-
   environment:
     MYSQL_DATABASE_HOST: "{{ ec2['instances'][0]['public_ip_address'] }}"
-    #MYSQL_DATABASE_HOST: 18.188.113.57
-    #shell: "echo $MYSQL_DATABASE_HOST"
-
   roles:
     - python
     - flask
@@ -88,18 +83,12 @@
         filters:
           "tag:Class": "Flask"
           instance-state-name: running
-        #aws_access_key:
-        #aws_secret_key:
       register: ec2targets
     - debug:
         var: item['instance_id']
-      #register: with_output
-      #debug: var=with_output
       with_items: "{{ ec2targets['instances'] }}"
-
   roles:
     - alb-target-group
-
 
 - name: add alb
   hosts: localhost

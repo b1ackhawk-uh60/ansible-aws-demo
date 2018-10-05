@@ -1,1 +1,2 @@
  ansible_ssh_private_key_file: ~/.ssh/ansible-demo.pem
+ region: us-east-2
