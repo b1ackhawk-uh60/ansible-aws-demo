@@ -1,0 +1,17 @@
+    - elb_application_lb:
+        name: ansible-alb
+        region: "{{region}}"
+        subnets:
+          - subnet-db1b46b3
+          - subnet-db8902a1
+          - subnet-0a6d9e46
+        security_groups:
+          - http only
+        scheme: internet-facing
+        listeners:
+          - Protocol: HTTP
+            Port: 80
+            DefaultActions:
+              - Type: forward
+                TargetGroupName: ansible-app
+        state: present

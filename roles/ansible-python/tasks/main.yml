@@ -1,0 +1,7 @@
+  - pause:
+      seconds: 30
+  - name: Ansible required Python
+    raw: bash -c "test -e /usr/bin/python || (apt -qqy update && apt install -qqy python python-pip python3 python3-pip)"
+    become: true
+    register: output
+    changed_when: output.stdout != ""
