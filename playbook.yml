@@ -4,10 +4,6 @@
   roles:
     - role: ec2_base
       vars:
-        #keypair: ansible-demo
-        #instance_type: t2.micro
-        #image: ami-0552e3455b9bc8d50
-        #region: us-east-2
         ec2_total_count: 1
         i_tags:
           Type: Ansible_Deployed
@@ -28,10 +24,6 @@
   roles:
     - role: ec2_base
       vars:
-        #keypair: ansible-demo
-        #instance_type: t2.micro
-        #image: ami-0552e3455b9bc8d50
-        #region: us-east-2
         ec2_total_count: "{{ ec2tc }}"
         i_tags:
           Type: Ansible_Deployed
@@ -56,6 +48,7 @@
 
 - name: Deploy Web
   hosts: tag_Class_Flask
+  #use pre_tasks for this becuase it needs to be done prior to roles
   pre_tasks:
     - name: Get IP of MySQL
       delegate_to: localhost
