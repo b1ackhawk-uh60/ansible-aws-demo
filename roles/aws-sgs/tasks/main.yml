@@ -1,0 +1,35 @@
+- name: create ssl access security group
+  ec2_group:
+    name: ssh-ansible
+    description: ssh access for ansible
+    region: "{{ region }}"
+    rules:
+      - proto: tcp
+        ports: 22
+        cidr_ip: 0.0.0.0/0
+        cidr_ipv6: ::/0
+
+- name: create mysql access security group
+  ec2_group:
+    name: mysql-ansible
+    description: mysql access for ansible
+    region: "{{ region }}"
+    rules:
+      - proto: tcp
+        ports: 3306
+        cidr_ip: 0.0.0.0/0
+        cidr_ipv6: ::/0
+
+- name: create flask access security group
+  ec2_group:
+    name: flask-ansible
+    description: flask access for ansible
+    region: "{{ region }}"
+    rules:
+      - proto: tcp
+        ports: 5000
+        cidr_ip: 0.0.0.0/0
+        cidr_ipv6: ::/0
+
+- pause:
+    seconds: 5
