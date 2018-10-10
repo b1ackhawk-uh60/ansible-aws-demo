@@ -1,2 +1,3 @@
- ansible_ssh_private_key_file: ~/.ssh/ansible-demo.pem
+ ansible_ssh_private_key_file: ansible-demo.pem
  region: us-east-2
+ ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
