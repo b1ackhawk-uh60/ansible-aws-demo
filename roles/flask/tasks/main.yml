@@ -13,14 +13,19 @@
 
     - name: echo env variable
       shell: echo $MYSQL_DATABASE_HOST
+      environment: 
+        MYSQL_DATABASE_HOST: "{{ ec2ev }}"
       register: dbhost
     - debug: msg="dbhost is {{ dbhost.stdout }}"
 
     - name: Start Web Server
       #shell: python -m flask --version
       shell: FLASK_APP=/home/ubuntu/app/app.py nohup python -m flask run --host=0.0.0.0 &
+      environment:
+        MYSQL_DATABASE_HOST: "{{ ec2ev }}"
       #shell: nohup python /home/ubuntu/app/app.py 2>&1 >/dev/null &
       register: shell_output
+
 
     - name: view output
       debug:
