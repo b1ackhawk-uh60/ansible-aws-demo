@@ -54,7 +54,7 @@
 
 - name: Deploy Web
   hosts: tag_Class_Flask
-  #use pre_tasks for this becuase it needs to be done prior to roles
+  #use pre_tasks for this because it needs to be done prior to roles
   pre_tasks:
     - name: Get IP of MySQL
       delegate_to: localhost
@@ -63,8 +63,6 @@
         filters:
           "tag:Class": "MySQL"
           instance-state-name: running
-        #aws_access_key:
-        #aws_secret_key:
       register: ec2
     - debug: var=ec2['instances'][0]['public_ip_address']
   roles:
