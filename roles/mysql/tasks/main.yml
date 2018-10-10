@@ -46,3 +46,27 @@
       register: shell_output
     - debug:
         var: shell_output
+
+
+#For demo purposes, adding a table and data
+    - name: create a sample table
+      become: yes
+      become_user: root
+      command: >
+        mysql employee_db
+        --batch --skip-column-names
+        --execute="CREATE TABLE IF NOT EXISTS employees (name VARCHAR(20))"
+      register: shell_output
+    - debug:
+        var: shell_output
+
+    - name: add sample data
+      become: yes
+      become_user: root
+      command: >
+        mysql employee_db
+        --batch --skip-column-names
+        --execute="INSERT INTO employees VALUES ('Ripley')"
+      register: shell_output
+    - debug:
+        var: shell_output
