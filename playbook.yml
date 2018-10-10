@@ -1,3 +1,9 @@
+- name: Create Security Groups
+  hosts: localhost
+  gather_facts: False
+  roles:
+    - aws-sgs
+
 - name: Create db instance
   hosts: localhost
   gather_facts: False
@@ -11,8 +17,8 @@
         c_tag:
           Class: MySQL
         ec2_groups:
-          - ssh-only
-          - mysql all
+          - ssh-ansible
+          - mysql-ansible
 
 - name: Create web instances
   hosts: localhost
@@ -31,8 +37,8 @@
         c_tag:
           Class: Flask
         ec2_groups:
-          - ssh-only
-          - flask all
+          - ssh-ansible
+          - flask-ansible
 
 - name: Install Ansible required Python
   hosts: tag_Type_Ansible_Deployed
@@ -61,11 +67,12 @@
         #aws_secret_key:
       register: ec2
     - debug: var=ec2['instances'][0]['public_ip_address']
-  environment:
-    MYSQL_DATABASE_HOST: "{{ ec2['instances'][0]['public_ip_address'] }}"
   roles:
-    - python
-    - flask
+    - role: python
+    - role: flask
+      vars:
+        ec2ev: "{{ ec2['instances'][0]['public_ip_address'] }}"
+
 
 - name: add target group for alb
   hosts: localhost
