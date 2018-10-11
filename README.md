@@ -24,3 +24,7 @@ The outline of the project is as follows:
 - An AWS Application Load Balancer is created.
 
 Once everything is complete and the Load Balancer is fully provisioned, you should be able to access the app in your browser by going to the ALB's DNS name as indicated in the AWS console. Aside from the Welcome! page there is also "/how are you" and "/read from database", which will read from the database to very connectivity to the database.
+
+I've left some debug tasks for demonstration purposes, for the sake of having a peek into what is going on.
+
+*Important: The security group configuration will only allow ssh access (required for ansible) from the AWS SG named "ssh-only" so the Ansible Controller must have a security group attached named "ssh-only".
