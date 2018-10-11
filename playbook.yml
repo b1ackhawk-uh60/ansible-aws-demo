@@ -64,13 +64,11 @@
           "tag:Class": "MySQL"
           instance-state-name: running
       register: ec2
-    #- debug: var=ec2['instances'][0]['public_ip_address']
     - debug: var=ec2['instances'][0]['private_ip_address']
   roles:
     - role: python
     - role: flask
       vars:
-        #ec2ev: "{{ ec2['instances'][0]['public_ip_address'] }}"
         ec2ev: "{{ ec2['instances'][0]['private_ip_address'] }}"
 
 
