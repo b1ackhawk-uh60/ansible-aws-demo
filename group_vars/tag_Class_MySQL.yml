@@ -1,6 +1,7 @@
 db_name: employee_db
 db_user: db_user
 #db_password: Passw0rd
+#paste vault encrpyted variable below
 db_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           35376561353661333135626630666366323963353461313833646431383132663364633265643461
