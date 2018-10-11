@@ -1,3 +1,4 @@
+# cidr_ip fields may be used instead of group_name for troubleshooting
 - name: create ssl access security group
   ec2_group:
     name: ssh-ansible
@@ -6,17 +7,18 @@
     rules:
       - proto: tcp
         ports: 22
-        cidr_ip: 0.0.0.0/0
-        cidr_ipv6: ::/0
+        #cidr_ip: 0.0.0.0/0
+        #cidr_ipv6: ::/0
+        group_name: ssh-only
 
-- name: create mysql access security group
+- name: create http access security group
   ec2_group:
-    name: mysql-ansible
-    description: mysql access for ansible
+    name: http-ansible
+    description: flask access for ansible
     region: "{{ region }}"
     rules:
       - proto: tcp
-        ports: 3306
+        ports: 80
         cidr_ip: 0.0.0.0/0
         cidr_ipv6: ::/0
 
@@ -28,8 +30,22 @@
     rules:
       - proto: tcp
         ports: 5000
-        cidr_ip: 0.0.0.0/0
-        cidr_ipv6: ::/0
+        #cidr_ip: 0.0.0.0/0
+        #cidr_ipv6: ::/0
+        group_name: http-ansible
+
+- name: create mysql access security group
+  ec2_group:
+    name: mysql-ansible
+    description: mysql access for ansible
+    region: "{{ region }}"
+    rules:
+      - proto: tcp
+        ports: 3306
+        #cidr_ip: 0.0.0.0/0
+        #cidr_ipv6: ::/0
+        group_name: flask-ansible
+
 
 - pause:
     seconds: 10
