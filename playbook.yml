@@ -90,5 +90,26 @@
 
 - name: add alb
   hosts: localhost
+  pre_tasks:
+    - name: Get subnets for alb
+      ec2_vpc_subnet_facts:
+        region: "{{region}}"
+      register: ec2subnets
+    - debug: var=ec2subnets['subnets']|map(attribute='id')|list
+
   roles:
-    - aws-alb
+    - role: aws-alb
+      vars:
+        albsubnets: "{{ ec2subnets['subnets']|map(attribute='id')|list }}"
+
+- name: Send notification email
+  hosts: localhost
+  tasks:
+    - mail:
+        host: smtp.gmail.com
+        port: 587
+        username: "{{ gmailuser }}"
+        password: "{{ gmailpass }}"
+        to: example@example.com
+        subject: Wep App Deployed
+        body: The Web App has been deployed, use load balancers DNS name to access.
