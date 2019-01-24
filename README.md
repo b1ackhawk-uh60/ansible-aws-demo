@@ -1,5 +1,5 @@
 # ansible-aws-demo
-A demo project utilizing ansible and aws to deploy a web app
+A demo project utilizing ansible and aws to create infrastructure and deploy a web app
 
 The ansible controller used is Ubuntu 16 or 18 ( I experimented with both), python installed, pip installed, ansible installed via pip, boto and boto3 installed via pip.
 The target machines are created with an out of the box AWS Ubuntu 16 AMI. Because the AWS image doesn't have python installed by default, the playbook will ssh in to perform a standard python install first, before performing any other normal ansible actions, which will require python be installed. A customized AMI could be used with python pre-installed to avoid this. However, I wanted to demonstrate ansible automation from an out of the box image, a blank slate so to speak.
